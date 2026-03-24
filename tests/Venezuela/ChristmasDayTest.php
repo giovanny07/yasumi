@@ -21,13 +21,11 @@ use Yasumi\Holiday;
 use Yasumi\tests\HolidayTestCase;
 
 /**
- * Class for testing New Year's Eve (Víspera de Año Nuevo, 31 December) in Venezuela.
- *
- * Established by LOTTT Art. 184(b).
+ * Class for testing Christmas Day (Navidad, 25 December) in Venezuela.
  */
-class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
+class ChristmasDayTest extends VenezuelaBaseTestCase implements HolidayTestCase
 {
-    public const HOLIDAY = 'newYearsEve';
+    public const HOLIDAY = 'christmasDay';
 
     /** @throws \Exception */
     public function testHoliday(): void
@@ -37,7 +35,7 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
             self::REGION,
             self::HOLIDAY,
             $year,
-            new \DateTime("{$year}-12-31", new \DateTimeZone(self::TIMEZONE))
+            new \DateTime("{$year}-12-25", new \DateTimeZone(self::TIMEZONE))
         );
     }
 
@@ -48,7 +46,7 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
             self::REGION,
             self::HOLIDAY,
             static::generateRandomYear(),
-            [self::LOCALE => 'Víspera de Año Nuevo']
+            [self::LOCALE => 'Navidad']
         );
     }
 

@@ -18,27 +18,35 @@ declare(strict_types = 1);
 namespace Yasumi\tests\Venezuela;
 
 use Yasumi\Holiday;
+use Yasumi\Provider\Venezuela;
 use Yasumi\tests\HolidayTestCase;
 
 /**
- * Class for testing New Year's Eve (Víspera de Año Nuevo, 31 December) in Venezuela.
+ * Class for testing Simón Bolívar's Birthday (24 July) in Venezuela.
  *
- * Established by LOTTT Art. 184(b).
+ * Simón Bolívar was born on 24 July 1783 in Caracas.
  */
-class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
+class BolivarBirthdayDayTest extends VenezuelaBaseTestCase implements HolidayTestCase
 {
-    public const HOLIDAY = 'newYearsEve';
+    public const HOLIDAY = 'bolivarBirthdayDay';
+    public const ESTABLISHMENT_YEAR = Venezuela::BOLIVAR_BIRTH_YEAR;
 
     /** @throws \Exception */
     public function testHoliday(): void
     {
-        $year = 2025;
+        $year = self::ESTABLISHMENT_YEAR;
         $this->assertHoliday(
             self::REGION,
             self::HOLIDAY,
             $year,
-            new \DateTime("{$year}-12-31", new \DateTimeZone(self::TIMEZONE))
+            new \DateTime("{$year}-07-24", new \DateTimeZone(self::TIMEZONE))
         );
+    }
+
+    /** @throws \Exception */
+    public function testNotHoliday(): void
+    {
+        $this->assertNotHoliday(self::REGION, self::HOLIDAY, self::ESTABLISHMENT_YEAR - 1);
     }
 
     /** @throws \Exception */
@@ -47,14 +55,14 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
         $this->assertTranslatedHolidayName(
             self::REGION,
             self::HOLIDAY,
-            static::generateRandomYear(),
-            [self::LOCALE => 'Víspera de Año Nuevo']
+            static::generateRandomYear(self::ESTABLISHMENT_YEAR),
+            [self::LOCALE => 'Natalicio de Simón Bolívar']
         );
     }
 
     /** @throws \Exception */
     public function testHolidayType(): void
     {
-        $this->assertHolidayType(self::REGION, self::HOLIDAY, static::generateRandomYear(), Holiday::TYPE_OFFICIAL);
+        $this->assertHolidayType(self::REGION, self::HOLIDAY, static::generateRandomYear(self::ESTABLISHMENT_YEAR), Holiday::TYPE_OFFICIAL);
     }
 }

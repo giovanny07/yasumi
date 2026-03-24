@@ -21,20 +21,18 @@ use PHPUnit\Framework\TestCase;
 use Yasumi\tests\YasumiBase;
 
 /**
- * Class VenezuelaBaseTestCase.
+ * Base class for Venezuela holiday tests.
  */
 abstract class VenezuelaBaseTestCase extends TestCase
 {
     use YasumiBase;
 
-    /**
-     * Country (name) to be tested.
-     */
+    /** Country (name) to be tested. */
     public const REGION = 'Venezuela';
 
     /** Timezone in which this provider has holidays defined. */
     public const TIMEZONE = 'America/Caracas';
 
     /** Locale that is considered common for this provider. */
-    public const LOCALE = 'es_VE';
+    public const LOCALE = 'es';
 }

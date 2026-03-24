@@ -21,13 +21,11 @@ use Yasumi\Holiday;
 use Yasumi\tests\HolidayTestCase;
 
 /**
- * Class for testing New Year's Eve (Víspera de Año Nuevo, 31 December) in Venezuela.
- *
- * Established by LOTTT Art. 184(b).
+ * Class for testing International Workers' Day in Venezuela.
  */
-class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
+class InternationalWorkersDayTest extends VenezuelaBaseTestCase implements HolidayTestCase
 {
-    public const HOLIDAY = 'newYearsEve';
+    public const HOLIDAY = 'internationalWorkersDay';
 
     /** @throws \Exception */
     public function testHoliday(): void
@@ -37,7 +35,7 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
             self::REGION,
             self::HOLIDAY,
             $year,
-            new \DateTime("{$year}-12-31", new \DateTimeZone(self::TIMEZONE))
+            new \DateTime("{$year}-05-01", new \DateTimeZone(self::TIMEZONE))
         );
     }
 
@@ -48,7 +46,7 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
             self::REGION,
             self::HOLIDAY,
             static::generateRandomYear(),
-            [self::LOCALE => 'Víspera de Año Nuevo']
+            [self::LOCALE => 'Día del Trabajador']
         );
     }
 

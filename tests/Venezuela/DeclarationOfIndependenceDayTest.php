@@ -22,15 +22,14 @@ use Yasumi\Provider\Venezuela;
 use Yasumi\tests\HolidayTestCase;
 
 /**
- * Class for testing Independence Day (5 July) in Venezuela.
+ * Class for testing Declaration of Independence Day (19 April) in Venezuela.
  *
- * Commemorates the formal Declaration of Independence signed by the
- * Venezuelan Congress on 5 July 1811.
+ * Commemorates the Caracas City Council act of 19 April 1810.
  */
-class IndependenceDayTest extends VenezuelaBaseTestCase implements HolidayTestCase
+class DeclarationOfIndependenceDayTest extends VenezuelaBaseTestCase implements HolidayTestCase
 {
-    public const HOLIDAY = 'independenceDay';
-    public const ESTABLISHMENT_YEAR = Venezuela::INDEPENDENCE_YEAR;
+    public const HOLIDAY = 'declarationOfIndependenceDay';
+    public const ESTABLISHMENT_YEAR = Venezuela::DECLARATION_OF_INDEPENDENCE_YEAR;
 
     /** @throws \Exception */
     public function testHoliday(): void
@@ -40,7 +39,7 @@ class IndependenceDayTest extends VenezuelaBaseTestCase implements HolidayTestCa
             self::REGION,
             self::HOLIDAY,
             $year,
-            new \DateTime("{$year}-07-05", new \DateTimeZone(self::TIMEZONE))
+            new \DateTime("{$year}-04-19", new \DateTimeZone(self::TIMEZONE))
         );
     }
 
@@ -57,7 +56,7 @@ class IndependenceDayTest extends VenezuelaBaseTestCase implements HolidayTestCa
             self::REGION,
             self::HOLIDAY,
             static::generateRandomYear(self::ESTABLISHMENT_YEAR),
-            [self::LOCALE => 'Día de la Independencia']
+            [self::LOCALE => 'Declaración de Independencia']
         );
     }
 

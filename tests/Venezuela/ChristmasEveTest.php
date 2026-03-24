@@ -21,23 +21,18 @@ use Yasumi\Holiday;
 use Yasumi\tests\HolidayTestCase;
 
 /**
- * Class for testing Christmas Eve in Venezuela.
+ * Class for testing Christmas Eve (Nochebuena, 24 December) in Venezuela.
+ *
+ * Established by LOTTT Art. 184(b).
  */
 class ChristmasEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
 {
-    /**
-     * The name of the holiday.
-     */
     public const HOLIDAY = 'christmasEve';
 
-    /**
-     * Tests Christmas Eve.
-     *
-     * @throws \Exception
-     */
-    public function testChristmasEve(): void
+    /** @throws \Exception */
+    public function testHoliday(): void
     {
-        $year = static::generateRandomYear();
+        $year = 2025;
         $this->assertHoliday(
             self::REGION,
             self::HOLIDAY,
@@ -46,30 +41,20 @@ class ChristmasEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
         );
     }
 
-    /**
-     * Tests the translated name of the holiday defined in this test.
-     *
-     * @throws \Exception
-     */
+    /** @throws \Exception */
     public function testTranslation(): void
     {
-        $year = static::generateRandomYear();
         $this->assertTranslatedHolidayName(
             self::REGION,
             self::HOLIDAY,
-            $year,
+            static::generateRandomYear(),
             [self::LOCALE => 'Nochebuena']
         );
     }
 
-    /**
-     * Tests type of the holiday defined in this test.
-     *
-     * @throws \Exception
-     */
+    /** @throws \Exception */
     public function testHolidayType(): void
     {
-        $year = static::generateRandomYear();
-        $this->assertHolidayType(self::REGION, self::HOLIDAY, $year, Holiday::TYPE_OFFICIAL);
+        $this->assertHolidayType(self::REGION, self::HOLIDAY, static::generateRandomYear(), Holiday::TYPE_OFFICIAL);
     }
 }

@@ -23,6 +23,10 @@ use Yasumi\Holiday;
 /**
  * Provider for all holidays in Venezuela.
  *
+ * Venezuela observes 14 public holidays established by the Ley Orgánica del
+ * Trabajo, los Trabajadores y las Trabajadoras (LOTTT, Art. 184) and the
+ * Ley de Fiestas Nacionales (1971).
+ *
  * @see https://en.wikipedia.org/wiki/Public_holidays_in_Venezuela
  */
 class Venezuela extends AbstractProvider
@@ -31,13 +35,39 @@ class Venezuela extends AbstractProvider
     use ChristianHolidays;
 
     /**
-     * The year when Venezuela declared independence from Spain.
+     * Year Venezuela declared the first act of independence (19 April 1810).
      */
-    public const DECLARATION_OF_INDEPENDENCE_YEAR = 1811;
+    public const DECLARATION_OF_INDEPENDENCE_YEAR = 1810;
 
     /**
-     * Code to identify this Holiday Provider. Typically, this is the ISO3166 code corresponding to the respective
-     * country or sub-region.
+     * Year Venezuela formally declared full independence (5 July 1811).
+     */
+    public const INDEPENDENCE_YEAR = 1811;
+
+    /**
+     * Year of the Battle of Carabobo, which secured independence (24 June 1821).
+     */
+    public const BATTLE_OF_CARABOBO_YEAR = 1821;
+
+    /**
+     * Birth year of Simón Bolívar (24 July 1783).
+     */
+    public const BOLIVAR_BIRTH_YEAR = 1783;
+
+    /**
+     * Year Columbus arrived in the Americas (12 October 1492).
+     */
+    public const COLUMBUS_YEAR = 1492;
+
+    /**
+     * Year the holiday was renamed from "Día de la Raza" to
+     * "Día de la Resistencia Indígena" (Decreto 2028, 2002).
+     */
+    public const INDIGENOUS_RESISTANCE_YEAR = 2002;
+
+    /**
+     * Code to identify this Holiday Provider. Typically, this is the ISO3166
+     * code corresponding to the respective country or sub-region.
      */
     public const ID = 'VE';
 
@@ -52,28 +82,28 @@ class Venezuela extends AbstractProvider
     {
         $this->timezone = 'America/Caracas';
 
-        // Add common holidays
+        // Fixed holidays defined in LOTTT Art. 184(b)
         $this->addHoliday($this->newYearsDay($this->year, $this->timezone, $this->locale));
-        $this->addHoliday($this->internationalWorkersDay($this->year, $this->timezone, $this->locale));
-
-        // Add Christian holidays
-        $this->addHoliday($this->christmasDay($this->year, $this->timezone, $this->locale));
         $this->addHoliday($this->maundyThursday($this->year, $this->timezone, $this->locale));
         $this->addHoliday($this->goodFriday($this->year, $this->timezone, $this->locale));
+        $this->addHoliday($this->internationalWorkersDay($this->year, $this->timezone, $this->locale));
+        $this->addHoliday($this->christmasEve($this->year, $this->timezone, $this->locale, Holiday::TYPE_OFFICIAL));
+        $this->addHoliday($this->christmasDay($this->year, $this->timezone, $this->locale));
+        $this->addHoliday($this->newYearsEve($this->year, $this->timezone, $this->locale));
 
-        // Calculate country-specific holidays
-        $this->calculateCarnaval();
-        $this->calculateDeclarationOfIndependence();
-        $this->calculateBattleOfCarabobo();
-        $this->calculateIndependenceDay();
-        $this->calculateSimonBolivarBirthday();
-        $this->calculateDayOfIndigenousResistance();
-        $this->calculateChristmasEve();
-        $this->calculateNewYearsEve();
+        // Carnival (LOTTT Art. 184(b): Monday and Tuesday before Easter)
+        $this->addCarnivalHolidays();
+
+        // Fixed holidays defined in Ley de Fiestas Nacionales
+        $this->addDeclarationOfIndependenceDay();
+        $this->addBattleOfCaraboboDay();
+        $this->addIndependenceDay();
+        $this->addBolivarBirthdayDay();
+        $this->addIndigenousResistanceDay();
     }
 
     /**
-     * Returns a list of sources for holiday calculations.
+     * The source of the holidays.
      *
      * @return string[] The source URLs
      */
@@ -81,74 +111,72 @@ class Venezuela extends AbstractProvider
     {
         return [
             'https://en.wikipedia.org/wiki/Public_holidays_in_Venezuela',
-            'https://www.timeanddate.com/holidays/venezuela/',
-            'https://www.officeholidays.com/countries/venezuela',
+            'https://accesoalajusticia.org/glossary/dias-festivos/',
+            'https://venezuela.justia.com/federales/leyes/ley-de-fiestas-nacionales/gdoc/',
+            'https://www.asambleanacional.gob.ve/leyes/sancionadas/ley-de-reforma-parcial-de-la-ley-de-fiestas-nacionales',
         ];
     }
 
     /**
-     * Carnaval (Carnival).
+     * Carnival Monday and Tuesday.
      *
-     * Carnival is celebrated on Monday and Tuesday before Ash Wednesday.
-     * It is one of the most important celebrations in Venezuela.
+     * Established by LOTTT Art. 184(b). Carnival falls on the Monday and
+     * Tuesday immediately before Ash Wednesday (Easter − 48 and Easter − 47 days).
      *
      * @throws \Exception
      */
-    protected function calculateCarnaval(): void
+    protected function addCarnivalHolidays(): void
     {
-        if ($this->year >= 1700) {
-            $easter = $this->calculateEaster($this->year, $this->timezone);
+        $easter = $this->calculateEaster($this->year, $this->timezone);
 
-            $days = [
-                'carnavalMonday' => [
-                    'interval' => 'P48D',
-                    'name_es' => 'Lunes de Carnaval',
-                    'name_en' => 'Carnival Monday',
-                ],
-                'carnavalTuesday' => [
-                    'interval' => 'P47D',
-                    'name_es' => 'Martes de Carnaval',
-                    'name_en' => 'Carnival Tuesday',
-                ],
-            ];
+        $days = [
+            'carnivalMonday' => [
+                'interval' => 'P48D',
+                'es'       => 'Lunes de Carnaval',
+                'en'       => 'Carnival Monday',
+            ],
+            'carnivalTuesday' => [
+                'interval' => 'P47D',
+                'es'       => 'Martes de Carnaval',
+                'en'       => 'Carnival Tuesday',
+            ],
+        ];
 
-            foreach ($days as $name => $day) {
-                $date = (clone $easter)->sub(new \DateInterval($day['interval']));
+        foreach ($days as $key => $day) {
+            $date = (clone $easter)->sub(new \DateInterval($day['interval']));
 
-                if (! $date instanceof \DateTime) {
-                    throw new \RuntimeException(sprintf('unable to perform a date subtraction for %s:%s', self::class, $name));
-                }
-
-                $this->addHoliday(new Holiday(
-                    $name,
-                    [
-                        'es' => $day['name_es'],
-                        'en' => $day['name_en'],
-                    ],
-                    $date,
-                    $this->locale
-                ));
+            if (! $date instanceof \DateTime) {
+                throw new \RuntimeException(sprintf('Unable to perform date subtraction for %s:%s', self::class, $key));
             }
+
+            $this->addHoliday(new Holiday(
+                $key,
+                ['es' => $day['es'], 'en' => $day['en']],
+                $date,
+                $this->locale
+            ));
         }
     }
 
     /**
-     * Declaration of Independence.
+     * Declaration of Independence Day (19 April).
      *
-     * On April 19, 1810, Venezuela began its independence movement by establishing a junta
-     * that deposed the Spanish colonial authorities. This date marks the beginning of
-     * Venezuelan independence.
+     * Commemorates the Caracas City Council's act of 19 April 1810 that
+     * removed the Spanish Captain-General, marking the start of Venezuela's
+     * independence movement.
      *
      * @see https://en.wikipedia.org/wiki/Venezuelan_Declaration_of_Independence
+     *
+     * @throws \Exception
      */
-    protected function calculateDeclarationOfIndependence(): void
+    protected function addDeclarationOfIndependenceDay(): void
     {
-        if ($this->year >= 1810) {
+        if ($this->year >= self::DECLARATION_OF_INDEPENDENCE_YEAR) {
             $this->addHoliday(new Holiday(
-                'declarationOfIndependence',
+                'declarationOfIndependenceDay',
                 [
-                    'es' => 'Declaración de la Independencia',
-                    'en' => 'Declaration of Independence',
+                    'es' => 'Declaración de Independencia',
+                    'en' => 'Declaration of Independence Day',
                 ],
                 new \DateTime("{$this->year}-04-19", DateTimeZoneFactory::getDateTimeZone($this->timezone)),
                 $this->locale
@@ -157,21 +185,23 @@ class Venezuela extends AbstractProvider
     }
 
     /**
-     * Battle of Carabobo.
+     * Battle of Carabobo Day (24 June).
      *
-     * The Battle of Carabobo was fought on June 24, 1821. It was the decisive battle
-     * in the Venezuelan War of Independence that established the independence of Venezuela.
+     * Commemorates the decisive battle of 24 June 1821 that secured
+     * Venezuela's independence from Spain.
      *
      * @see https://en.wikipedia.org/wiki/Battle_of_Carabobo
+     *
+     * @throws \Exception
      */
-    protected function calculateBattleOfCarabobo(): void
+    protected function addBattleOfCaraboboDay(): void
     {
-        if ($this->year >= 1821) {
+        if ($this->year >= self::BATTLE_OF_CARABOBO_YEAR) {
             $this->addHoliday(new Holiday(
-                'battleOfCarabobo',
+                'battleOfCaraboboDay',
                 [
                     'es' => 'Batalla de Carabobo',
-                    'en' => 'Battle of Carabobo',
+                    'en' => 'Battle of Carabobo Day',
                 ],
                 new \DateTime("{$this->year}-06-24", DateTimeZoneFactory::getDateTimeZone($this->timezone)),
                 $this->locale
@@ -180,16 +210,18 @@ class Venezuela extends AbstractProvider
     }
 
     /**
-     * Independence Day.
+     * Independence Day (5 July).
      *
-     * Venezuelan Independence Day is celebrated on July 5th, marking the day when
-     * the Congress of Venezuela declared independence from Spain in 1811.
+     * Commemorates the formal Declaration of Independence signed by the
+     * Venezuelan Congress on 5 July 1811.
      *
-     * @see https://en.wikipedia.org/wiki/Venezuelan_Independence
+     * @see https://en.wikipedia.org/wiki/Venezuelan_Declaration_of_Independence
+     *
+     * @throws \Exception
      */
-    protected function calculateIndependenceDay(): void
+    protected function addIndependenceDay(): void
     {
-        if ($this->year >= self::DECLARATION_OF_INDEPENDENCE_YEAR) {
+        if ($this->year >= self::INDEPENDENCE_YEAR) {
             $this->addHoliday(new Holiday(
                 'independenceDay',
                 [
@@ -203,21 +235,23 @@ class Venezuela extends AbstractProvider
     }
 
     /**
-     * Simon Bolivar's Birthday.
+     * Simón Bolívar's Birthday (24 July).
      *
-     * Simon Bolivar was born on July 24, 1783 in Caracas. He is considered the
-     * liberator of Venezuela, Colombia, Ecuador, Peru, and Bolivia.
+     * Commemorates the birth of Simón Bolívar, Liberator of Venezuela and
+     * five other South American nations, born on 24 July 1783.
      *
-     * @see https://en.wikipedia.org/wiki/Simon_Bolivar
+     * @see https://en.wikipedia.org/wiki/Sim%C3%B3n_Bol%C3%ADvar
+     *
+     * @throws \Exception
      */
-    protected function calculateSimonBolivarBirthday(): void
+    protected function addBolivarBirthdayDay(): void
     {
-        if ($this->year >= 1783) {
+        if ($this->year >= self::BOLIVAR_BIRTH_YEAR) {
             $this->addHoliday(new Holiday(
-                'simonBolivarBirthday',
+                'bolivarBirthdayDay',
                 [
-                    'es' => 'Natalicio del Libertador',
-                    'en' => "Simon Bolivar\u{2019}s Birthday",
+                    'es' => 'Natalicio de Simón Bolívar',
+                    'en' => 'Simón Bolívar’s Birthday',
                 ],
                 new \DateTime("{$this->year}-07-24", DateTimeZoneFactory::getDateTimeZone($this->timezone)),
                 $this->locale
@@ -226,63 +260,29 @@ class Venezuela extends AbstractProvider
     }
 
     /**
-     * Day of Indigenous Resistance.
+     * Day of Indigenous Resistance / Columbus Day (12 October).
      *
-     * Formerly known as "Columbus Day" or "Day of the Race" (Día de la Raza), this holiday
-     * was renamed in 2002 to Day of Indigenous Resistance (Día de la Resistencia Indígena)
-     * to honor the indigenous peoples who resisted European colonization.
+     * Known as "Día de la Raza" (Columbus Day) until 2001. Renamed to
+     * "Día de la Resistencia Indígena" (Day of Indigenous Resistance) by
+     * Presidential Decree 2028 in 2002 under President Hugo Chávez.
      *
      * @see https://en.wikipedia.org/wiki/Day_of_Indigenous_Resistance
+     *
+     * @throws \Exception
      */
-    protected function calculateDayOfIndigenousResistance(): void
+    protected function addIndigenousResistanceDay(): void
     {
-        if ($this->year >= 1921) {
+        if ($this->year >= self::COLUMBUS_YEAR) {
+            $name = $this->year >= self::INDIGENOUS_RESISTANCE_YEAR
+                ? ['es' => 'Día de la Resistencia Indígena', 'en' => 'Day of Indigenous Resistance']
+                : ['es' => 'Día de la Raza', 'en' => 'Columbus Day'];
+
             $this->addHoliday(new Holiday(
-                'dayOfIndigenousResistance',
-                [
-                    'es' => 'Día de la Resistencia Indígena',
-                    'en' => 'Day of Indigenous Resistance',
-                ],
+                'indigenousResistanceDay',
+                $name,
                 new \DateTime("{$this->year}-10-12", DateTimeZoneFactory::getDateTimeZone($this->timezone)),
                 $this->locale
             ));
         }
-    }
-
-    /**
-     * Christmas Eve.
-     *
-     * Christmas Eve (Nochebuena) is celebrated on December 24th and is an
-     * important family celebration in Venezuela.
-     */
-    protected function calculateChristmasEve(): void
-    {
-        $this->addHoliday(new Holiday(
-            'christmasEve',
-            [
-                'es' => 'Nochebuena',
-                'en' => 'Christmas Eve',
-            ],
-            new \DateTime("{$this->year}-12-24", DateTimeZoneFactory::getDateTimeZone($this->timezone)),
-            $this->locale
-        ));
-    }
-
-    /**
-     * New Year's Eve.
-     *
-     * New Year's Eve (Nochevieja) is celebrated on December 31st.
-     */
-    protected function calculateNewYearsEve(): void
-    {
-        $this->addHoliday(new Holiday(
-            'newYearsEve',
-            [
-                'es' => 'Nochevieja',
-                'en' => "New Year\u{2019}s Eve",
-            ],
-            new \DateTime("{$this->year}-12-31", DateTimeZoneFactory::getDateTimeZone($this->timezone)),
-            $this->locale
-        ));
     }
 }

@@ -18,16 +18,20 @@ declare(strict_types = 1);
 namespace Yasumi\tests\Venezuela;
 
 use Yasumi\Holiday;
+use Yasumi\Provider\ChristianHolidays;
 use Yasumi\tests\HolidayTestCase;
 
 /**
- * Class for testing New Year's Eve (Víspera de Año Nuevo, 31 December) in Venezuela.
+ * Class for testing Carnival Monday in Venezuela.
  *
- * Established by LOTTT Art. 184(b).
+ * Falls on Easter − 48 days (LOTTT Art. 184(b)).
+ * 2025: Easter = 20 Apr → Carnival Monday = 3 Mar.
  */
-class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
+class CarnivalMondayTest extends VenezuelaBaseTestCase implements HolidayTestCase
 {
-    public const HOLIDAY = 'newYearsEve';
+    use ChristianHolidays;
+
+    public const HOLIDAY = 'carnivalMonday';
 
     /** @throws \Exception */
     public function testHoliday(): void
@@ -37,7 +41,7 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
             self::REGION,
             self::HOLIDAY,
             $year,
-            new \DateTime("{$year}-12-31", new \DateTimeZone(self::TIMEZONE))
+            static::computeEaster($year, self::TIMEZONE)->sub(new \DateInterval('P48D'))
         );
     }
 
@@ -48,7 +52,7 @@ class NewYearsEveTest extends VenezuelaBaseTestCase implements HolidayTestCase
             self::REGION,
             self::HOLIDAY,
             static::generateRandomYear(),
-            [self::LOCALE => 'Víspera de Año Nuevo']
+            [self::LOCALE => 'Lunes de Carnaval']
         );
     }
 
